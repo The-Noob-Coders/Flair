@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  */
 public class FlairManager {
     private static @Nonnull HashMap<String, String> flairs = new HashMap<String, String>();
-    private static @Nonnull HashMap<String, List<ChatColor>> flairColorPrioritys = new HashMap<String, List<ChatColor>>();
+    private static @Nonnull HashMap<String, List<ChatColor>> flairColorPriorities = new HashMap<String, List<ChatColor>>();
     private static @Nonnull List<String> flairOrder = new ArrayList<String>();
 
     /**
@@ -38,7 +38,7 @@ public class FlairManager {
      */
     public FlairManager(String flair) {
         if(flair != null) {
-            FlairManager.flairColorPrioritys.put(flair, ImmutableList.copyOf(getFullColorSet()));
+            FlairManager.flairColorPriorities.put(flair, ImmutableList.copyOf(getFullColorSet()));
         }
     }
 
@@ -117,7 +117,7 @@ public class FlairManager {
 
         StringBuilder nameFlair = new StringBuilder();
         for(String flair : flairOrder) {
-            for(ChatColor c : FlairManager.flairColorPrioritys.get(flair)) {
+            for(ChatColor c : FlairManager.flairColorPriorities.get(flair)) {
                 if(c.isColor() && this.hasPermission(player, flair, c)) {
                     nameFlair.append(c).append(FlairManager.flairs.get(flair));
                 }
@@ -174,7 +174,7 @@ public class FlairManager {
     public @Nonnull List<ChatColor> getPriority(@Nonnull String flair) {
         Preconditions.checkNotNull(flair, "flair");
         
-        return FlairManager.flairColorPrioritys.get(flair);
+        return FlairManager.flairColorPriorities.get(flair);
     }
 
     /**
@@ -226,8 +226,8 @@ public class FlairManager {
             break;
         }
 
-        List<ChatColor> old = FlairManager.flairColorPrioritys.get(flair);
-        FlairManager.flairColorPrioritys.put(flair, ImmutableList.copyOf(newPriority));
+        List<ChatColor> old = FlairManager.flairColorPriorities.get(flair);
+        FlairManager.flairColorPriorities.put(flair, ImmutableList.copyOf(newPriority));
         return old;
     }
 
