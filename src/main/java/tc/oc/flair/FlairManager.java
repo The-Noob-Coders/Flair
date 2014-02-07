@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.permissions.Permissible;
@@ -32,6 +33,7 @@ public class FlairManager {
     private static @Nonnull HashMap<String, String> flairs = new HashMap<String, String>();
     private static @Nonnull HashMap<String, List<ChatColor>> flairColorPriorities = new HashMap<String, List<ChatColor>>();
     private static @Nonnull List<String> flairOrder = new ArrayList<String>();
+    public static @Nonnull HashMap<String, String> flairCache = new HashMap<String, String>();
 
     /**
      * Creates an instance with natural priority.
@@ -79,7 +81,7 @@ public class FlairManager {
             ConfigurationSection flairConfig = (ConfigurationSection) flairsConfig.get(flair);
 
             FlairManager.flairs.put(flair, flairConfig.getString("flair", "*"));
-            
+
             DefaultPriority defaultPriority = flairConfig.getString("default", "after").equalsIgnoreCase("before") ? DefaultPriority.BEFORE : DefaultPriority.AFTER;
 
             List<String> rawPriority = flairConfig.getStringList("priority");
@@ -115,6 +117,13 @@ public class FlairManager {
     public @Nonnull String getFlairs(@Nonnull Permissible player) {
         Preconditions.checkNotNull(player, "player");
 
+        if(player instanceof CommandSender) {
+            CommandSender sender = (CommandSender) player;
+            if(this.flairCache.containsKey(sender.getName())) {
+                return this.flairCache.get(sender.getName());
+            }
+        }
+
         StringBuilder nameFlair = new StringBuilder();
         for(String flair : flairOrder) {
             for(ChatColor c : FlairManager.flairColorPriorities.get(flair)) {
@@ -124,8 +133,14 @@ public class FlairManager {
             }
         }
 
+        String flair = nameFlair.toString();
 
-        return nameFlair.toString();
+        if(player instanceof CommandSender) {
+            CommandSender sender = (CommandSender) player;
+            this.flairCache.put(sender.getName(), flair);
+        }
+
+        return flair;
     }
 
     /**
@@ -173,7 +188,7 @@ public class FlairManager {
      */
     public @Nonnull List<ChatColor> getPriority(@Nonnull String flair) {
         Preconditions.checkNotNull(flair, "flair");
-        
+
         return FlairManager.flairColorPriorities.get(flair);
     }
 
@@ -242,7 +257,7 @@ public class FlairManager {
         }
         return colors;
     }
-    
+
     public static ChatColor parseChatColor(String text) {
         if(text == null) {
             return null;
